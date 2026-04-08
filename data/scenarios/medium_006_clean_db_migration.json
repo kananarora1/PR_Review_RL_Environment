@@ -1,0 +1,9 @@
+{
+  "pr_title": "feat: add zero-downtime schema migration for orders table",
+  "pr_description": "Adds a `fulfillment_date` column to the orders table. Uses the expand-contract pattern: column is added as nullable first (deploy 1), backfill runs async (deploy 2), NOT NULL constraint added after backfill completes (deploy 3). This PR covers deploy 1 only.",
+  "diff": "--- /dev/null\n+++ b/migrations/versions/0042_add_fulfillment_date.py\n@@ -0,0 +1,38 @@\n+\"\"\"add fulfillment_date to orders\n+\n+Revision ID: 0042\n+Revises: 0041\n+\"\"\"\n+from alembic import op\n+import sqlalchemy as sa\n+\n+\n+def upgrade():\n+    # Phase 1: add nullable column — safe to run against live traffic\n+    op.add_column(\n+        \"orders\",\n+        sa.Column(\"fulfillment_date\", sa.DateTime(timezone=True), nullable=True),\n+    )\n+    op.create_index(\n+        \"ix_orders_fulfillment_date\",\n+        \"orders\",\n+        [\"fulfillment_date\"],\n+        postgresql_where=sa.text(\"fulfillment_date IS NOT NULL\"),\n+    )\n+\n+\n+def downgrade():\n+    op.drop_index(\"ix_orders_fulfillment_date\", table_name=\"orders\")\n+    op.drop_column(\"orders\", \"fulfillment_date\")\n+\n+\n+--- a/src/models/order.py\n+++ b/src/models/order.py\n@@ -18,6 +18,9 @@ class Order(Base):\n     id = Column(Integer, primary_key=True)\n     user_id = Column(Integer, ForeignKey(\"users.id\"), nullable=False, index=True)\n     status = Column(String(32), nullable=False, default=\"pending\")\n     created_at = Column(DateTime(timezone=True), server_default=func.now())\n     total_cents = Column(Integer, nullable=False)\n+    fulfillment_date = Column(\n+        DateTime(timezone=True),\n+        nullable=True,   # will be NOT NULL after backfill; see migration plan\n+    )",
+  "ground_truth": {
+    "bugs": [],
+    "should_approve": true
+  }
+}

@@ -1,0 +1,33 @@
+name: PRReviewEnv
+version: "1.0.0"
+description: >
+  OpenEnv environment for evaluating AI agents on pull request code review.
+  Agents read git diffs, identify bugs and security issues, and make
+  approve/reject decisions.
+tasks:
+  - id: easy
+    description: Find obvious bugs in short single-file diffs
+    max_steps: 5
+    success_threshold: 0.7
+  - id: medium
+    description: Find logic bugs and security issues in multi-file diffs
+    max_steps: 10
+    success_threshold: 0.6
+  - id: hard
+    description: Full review of large diffs with subtle cross-file bugs
+    max_steps: 15
+    success_threshold: 0.5
+observation_space:
+  pr_title: string
+  pr_description: string
+  diff: string
+  file_tree: list[string]
+  comments_so_far: list[object]
+  step_count: integer
+  done: boolean
+action_space:
+  action_type: "enum[comment, approve, request_changes]"
+  file: "string (optional)"
+  line: "integer (optional)"
+  body: string
+reward_range: [-0.5, 1.0]

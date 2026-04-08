@@ -1,3 +1,18 @@
-.claude
-requirements.txt
-.idea
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables (never commit secrets)
+.env
+
+# IDE
+.idea/
+*.iml
+
+# Claude Code
+.claude/
+
+# Benchmark tooling (internal use only)
+verify.sh
