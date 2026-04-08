@@ -56,7 +56,7 @@ def grade(ground_truth: dict, comments: list[str], decision: str) -> dict:
     false_rejection_penalty = -0.2 if false_rejection else 0.0
 
     raw_score = bug_detection_rate * 0.7 + decision_score * 0.3 + false_rejection_penalty
-    final_score = round(max(0.01, min(0.99, raw_score)), 4)
+    final_score = round(max(0.02, min(0.98, raw_score)), 4)
 
     return {
         "score": final_score,

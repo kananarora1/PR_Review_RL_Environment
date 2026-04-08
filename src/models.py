@@ -33,7 +33,7 @@ class PRReviewReward(BaseModel):
     @classmethod
     def reward_must_be_strictly_between(cls, v: float) -> float:
         if v <= 0.0:
-            return 0.01
+            return 0.02
         if v >= 1.0:
-            return 0.99
+            return 0.98
         return v

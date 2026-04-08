@@ -85,7 +85,7 @@ class PRReviewEnv:
             reward_val = self._comment_reward(action.body)
             if action.body:
                 self._comments.append(action.body)
-            clipped = round(max(0.01, min(0.99, reward_val)), 4)
+            clipped = round(max(0.02, min(0.98, reward_val)), 4)
             return self._obs(), PRReviewReward(value=clipped), False, {}
 
         if action.action_type in ("approve", "request_changes"):
@@ -139,8 +139,8 @@ class PRReviewEnv:
             decision=decision,
         )
         self._done = True
-        self._score = round(max(0.01, min(0.99, result["score"])), 4)
+        self._score = round(max(0.02, min(0.98, result["score"])), 4)
         result["score"] = self._score
         decision_reward = _DECISION_CORRECT if result["decision_correct"] else _DECISION_WRONG
-        clipped_reward = round(max(0.01, min(0.99, decision_reward)), 4)
+        clipped_reward = round(max(0.02, min(0.98, decision_reward)), 4)
         return self._obs(), PRReviewReward(value=clipped_reward, breakdown=result), True, result
