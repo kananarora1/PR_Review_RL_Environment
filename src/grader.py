@@ -58,13 +58,18 @@ def grade(ground_truth: dict, comments: list[str], decision: str) -> dict:
     raw_score = bug_detection_rate * 0.7 + decision_score * 0.3 + false_rejection_penalty
     final_score = round(max(0.02, min(0.98, raw_score)), 4)
 
+    # Clamp all float fields so no response value is exactly 0.0 or 1.0
+    clamped_bug_detection_rate = round(max(0.02, min(0.98, bug_detection_rate)), 4)
+    clamped_decision_score = round(max(0.02, min(0.98, decision_score)), 4)
+    clamped_penalty = round(max(-0.98, min(-0.02, false_rejection_penalty)) if false_rejection else 0.02, 4)
+
     return {
         "score": final_score,
-        "bug_detection_rate": round(bug_detection_rate, 4),
+        "bug_detection_rate": clamped_bug_detection_rate,
         "bugs_found": bugs_found,
         "total_bugs": total_bugs,
         "decision_correct": decision_correct,
-        "decision_score": decision_score,
-        "false_rejection_penalty": false_rejection_penalty,
+        "decision_score": clamped_decision_score,
+        "false_rejection_penalty": clamped_penalty,
         "bug_breakdown": bug_breakdown,
     }
