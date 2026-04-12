@@ -1,0 +1,23 @@
+{
+  "pr_title": "feat: average product rating",
+  "pr_description": "Helper to calculate average rating.",
+  "diff": "--- a/src/stats.py\n+++ b/src/stats.py\n@@ -0,0 +1,3 @@\n+def get_avg(reviews: list) -> float:\n+    total = sum(reviews)\n+    return total / len(reviews)",
+  "repo_files": {
+    "src/stats.py": "def get_avg(reviews: list) -> float:\n    total = sum(reviews)\n    return total / len(reviews)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/stats.py",
+        "line": 3,
+        "keywords": [
+          "zerodivisionerror",
+          "division by zero",
+          "empty list",
+          "len(reviews)"
+        ]
+      }
+    ]
+  }
+}

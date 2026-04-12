@@ -1,0 +1,22 @@
+{
+  "pr_title": "feat: build funcs",
+  "pr_description": "Create a list of multiplier functions.",
+  "diff": "--- a/src/math.py\n+++ b/src/math.py\n@@ -0,0 +1,2 @@\n+def funcs():\n+    return [lambda x: x * i for i in range(5)]",
+  "repo_files": {
+    "src/math.py": "def funcs():\n    return [lambda x: x * i for i in range(5)]\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/math.py",
+        "line": 2,
+        "keywords": [
+          "late binding",
+          "closure",
+          "always uses last"
+        ]
+      }
+    ]
+  }
+}

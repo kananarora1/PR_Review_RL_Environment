@@ -1,0 +1,12 @@
+{
+  "pr_title": "feat: ping endpoint",
+  "pr_description": "Healthcheck route.",
+  "diff": "--- a/src/app.py\n+++ b/src/app.py\n@@ -5,0 +6,3 @@\n+@app.route('/ping')\n+def ping():\n+    return 'pong'",
+  "repo_files": {
+    "src/app.py": "from flask import Flask\napp = Flask(__name__)\n\n@app.route('/ping')\ndef ping():\n    return 'pong'\n"
+  },
+  "ground_truth": {
+    "should_approve": true,
+    "bugs": []
+  }
+}

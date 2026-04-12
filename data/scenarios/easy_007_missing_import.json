@@ -1,0 +1,22 @@
+{
+  "pr_title": "fix: use absolute paths",
+  "pr_description": "Switching to absolute paths.",
+  "diff": "--- a/src/files.py\n+++ b/src/files.py\n@@ -1,2 +1,2 @@\n def get_path(f):\n-    return f\n+    return os.path.abspath(f)",
+  "repo_files": {
+    "src/files.py": "def get_path(f):\n    return os.path.abspath(f)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/files.py",
+        "line": 2,
+        "keywords": [
+          "nameerror",
+          "os is not defined",
+          "missing import os"
+        ]
+      }
+    ]
+  }
+}

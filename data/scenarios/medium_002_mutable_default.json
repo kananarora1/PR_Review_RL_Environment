@@ -1,0 +1,23 @@
+{
+  "pr_title": "feat: fetch wrapper",
+  "pr_description": "Add default headers.",
+  "diff": "--- a/src/net.py\n+++ b/src/net.py\n@@ -0,0 +1,4 @@\n+import requests\n+def fetch(url, headers={}):\n+    headers['X-App'] = '1'\n+    return requests.get(url, headers=headers)",
+  "repo_files": {
+    "src/net.py": "import requests\ndef fetch(url, headers={}):\n    headers['X-App'] = '1'\n    return requests.get(url, headers=headers)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/net.py",
+        "line": 2,
+        "keywords": [
+          "mutable default",
+          "headers={}",
+          "shared state",
+          "memory leak"
+        ]
+      }
+    ]
+  }
+}

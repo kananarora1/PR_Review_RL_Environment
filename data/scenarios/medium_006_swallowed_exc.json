@@ -1,0 +1,23 @@
+{
+  "pr_title": "fix: stop crash",
+  "pr_description": "Don't crash on optional analytics.",
+  "diff": "--- a/src/track.py\n+++ b/src/track.py\n@@ -1,2 +1,5 @@\n def track(evt):\n-    api.send(evt)\n+    try:\n+        api.send(evt)\n+    except Exception:\n+        pass",
+  "repo_files": {
+    "src/track.py": "def track(evt):\n    try:\n        api.send(evt)\n    except Exception:\n        pass\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/track.py",
+        "line": 4,
+        "keywords": [
+          "swallowed exception",
+          "bare except",
+          "silently hides",
+          "pass"
+        ]
+      }
+    ]
+  }
+}

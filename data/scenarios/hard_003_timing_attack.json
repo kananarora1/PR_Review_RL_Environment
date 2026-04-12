@@ -1,0 +1,22 @@
+{
+  "pr_title": "feat: hmac verify",
+  "pr_description": "Verify signature.",
+  "diff": "--- a/src/sig.py\n+++ b/src/sig.py\n@@ -0,0 +1,3 @@\n+import hmac\n+def verify(s1, s2):\n+    return s1 == s2",
+  "repo_files": {
+    "src/sig.py": "import hmac\ndef verify(s1, s2):\n    return s1 == s2\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/sig.py",
+        "line": 3,
+        "keywords": [
+          "timing attack",
+          "compare_digest",
+          "constant time"
+        ]
+      }
+    ]
+  }
+}
