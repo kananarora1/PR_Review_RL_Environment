@@ -1,0 +1,23 @@
+{
+  "pr_title": "feat: safe delete",
+  "pr_description": "Check if file exists before deleting.",
+  "diff": "--- a/src/fs.py\n+++ b/src/fs.py\n@@ -0,0 +1,5 @@\n+import os, time\n+def safe_del(p):\n+    if os.path.exists(p):\n+        time.sleep(0.1)\n+        os.remove(p)",
+  "repo_files": {
+    "src/fs.py": "import os, time\ndef safe_del(p):\n    if os.path.exists(p):\n        time.sleep(0.1)\n        os.remove(p)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/fs.py",
+        "line": 3,
+        "keywords": [
+          "toctou",
+          "time of check",
+          "symlink",
+          "race condition"
+        ]
+      }
+    ]
+  }
+}

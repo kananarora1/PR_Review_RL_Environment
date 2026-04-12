@@ -1,7 +1,6 @@
 """PR review simulation environment (gym-style reset/step API)."""
 
 from __future__ import annotations
-
 import glob
 import json
 import os
@@ -12,19 +11,20 @@ from .grader import check_comment, grade
 from .models import PRReviewAction, PRReviewObservation, PRReviewReward
 
 _BUG_POOL = 0.68      
-_FALSE_POS = 0.02     
+_FALSE_POS = 0.01     
 _DECISION_CORRECT = 0.31
-_DECISION_WRONG = 0.02
+_DECISION_WRONG = 0.01
+_NEUTRAL_EXPLORATION = 0.01
 
 _SCENARIOS_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "scenarios")
 
 TASK_PREFIXES = {"easy": "easy_", "medium": "medium_", "hard": "hard_"}
-TASK_MAX_STEPS = {"easy": 5, "medium": 10, "hard": 15}
+# Increased max steps slightly to allow room for navigating files
+TASK_MAX_STEPS = {"easy": 8, "medium": 15, "hard": 20}
 TASK_THRESHOLDS = {"easy": 0.7, "medium": 0.6, "hard": 0.5}
 
 def clamp_value(v: float) -> float:
-    """Ensure values are strictly within (0, 1)."""
-    return round(max(0.02, min(0.98, float(v))), 4)
+    return round(max(0.01, min(0.99, float(v))), 4)
 
 def _load_all() -> dict[str, dict]:
     paths = glob.glob(os.path.join(_SCENARIOS_DIR, "*.json"))
@@ -35,7 +35,8 @@ def _load_all() -> dict[str, dict]:
         sid = os.path.splitext(os.path.basename(path))[0]
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
-        for field in ("pr_title", "pr_description", "diff", "ground_truth"):
+        # Ensure new schema fields exist
+        for field in ("pr_title", "pr_description", "diff", "ground_truth", "repo_files"):
             if field not in data:
                 raise ValueError(f"Scenario '{sid}' missing field '{field}'")
         store[sid] = data
@@ -52,11 +53,15 @@ class PRReviewEnv:
         self.threshold: float = TASK_THRESHOLDS[task]
         self._scenario_id: Optional[str] = None
         self._scenario: Optional[dict] = None
-        self._comments: list[str] = []
+        self._comments: list[dict] = []
         self._step_count: int = 0
         self._done: bool = False
         self._score: Optional[float] = None
         self._rewarded_bugs: set[int] = set()
+        
+        # Navigation state
+        self._current_file_path: str = ""
+        self._current_file_content: str = ""
 
     def reset(self) -> PRReviewObservation:
         prefix = TASK_PREFIXES[self.task]
@@ -70,6 +75,8 @@ class PRReviewEnv:
         self._done = False
         self._score = None
         self._rewarded_bugs = set()
+        self._current_file_path = ""
+        self._current_file_content = ""
         return self._obs()
 
     def step(self, action: PRReviewAction) -> tuple[PRReviewObservation, PRReviewReward, bool, dict]:
@@ -82,13 +89,32 @@ class PRReviewEnv:
 
         self._step_count += 1
 
-        if action.action_type == "comment":
-            reward_val = self._comment_reward(action.body)
-            if action.body:
-                self._comments.append(action.body)
-            clipped = clamp_value(reward_val)
-            return self._obs(), PRReviewReward(value=clipped), False, {}
+        # Handle Directory Traversal
+        if action.action_type == "read_file":
+            repo_files = self._scenario.get("repo_files", {})
+            target_file = action.file or ""
+            
+            if target_file in repo_files:
+                self._current_file_path = target_file
+                self._current_file_content = repo_files[target_file]
+            else:
+                self._current_file_content = f"Error: File '{target_file}' not found."
+            
+            # Neutral reward for exploring
+            return self._obs(), PRReviewReward(value=clamp_value(_NEUTRAL_EXPLORATION)), False, {}
 
+        # Handle Spatial Comments
+        if action.action_type == "comment":
+            reward_val = self._comment_reward(action.body, action.file, action.line)
+            if action.body:
+                self._comments.append({
+                    "file": action.file,
+                    "line": action.line,
+                    "body": action.body
+                })
+            return self._obs(), PRReviewReward(value=clamp_value(reward_val)), False, {}
+
+        # Handle Decisions
         if action.action_type in ("approve", "request_changes"):
             decision = "approve" if action.action_type == "approve" else "reject"
             return self._terminal_step(decision)
@@ -108,24 +134,30 @@ class PRReviewEnv:
 
     def _obs(self) -> PRReviewObservation:
         assert self._scenario is not None
+        repo_files = self._scenario.get("repo_files", {})
         return PRReviewObservation(
             diff=self._scenario["diff"],
             pr_description=self._scenario["pr_description"],
             pr_title=self._scenario["pr_title"],
-            comments_so_far=[{"body": c} for c in self._comments],
+            file_tree=list(repo_files.keys()),
+            current_file_path=self._current_file_path,
+            current_file_content=self._current_file_content,
+            comments_so_far=self._comments,
             step_count=self._step_count,
             done=self._done,
             scenario_id=self._scenario_id or "",
         )
 
-    def _comment_reward(self, body: str) -> float:
-        if not body:
+    def _comment_reward(self, body: str, file: Optional[str], line: Optional[int]) -> float:
+        if not body or not file or line is None:
             return _FALSE_POS
+            
         assert self._scenario is not None
         bugs: list = self._scenario["ground_truth"].get("bugs", [])
         if not bugs:
             return _FALSE_POS 
-        newly_found = [i for i in check_comment(body, bugs) if i not in self._rewarded_bugs]
+            
+        newly_found = [i for i in check_comment(body, file, line, bugs) if i not in self._rewarded_bugs]
         if newly_found:
             per_bug = _BUG_POOL / len(bugs)
             self._rewarded_bugs.update(newly_found)
@@ -143,5 +175,4 @@ class PRReviewEnv:
         self._score = clamp_value(result["score"])
         result["score"] = self._score
         decision_reward = _DECISION_CORRECT if result["decision_correct"] else _DECISION_WRONG
-        clipped_reward = clamp_value(decision_reward)
-        return self._obs(), PRReviewReward(value=clipped_reward, breakdown=result), True, result
+        return self._obs(), PRReviewReward(value=clamp_value(decision_reward), breakdown=result), True, result

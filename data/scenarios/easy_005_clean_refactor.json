@@ -1,0 +1,12 @@
+{
+  "pr_title": "refactor: extract string formatting",
+  "pr_description": "Cleans up greeting logic.",
+  "diff": "--- a/src/hello.py\n+++ b/src/hello.py\n@@ -1,3 +1,4 @@\n-def greet(n):\n-    return f\"Hi {n}\"\n+def fmt(n):\n+    return f\"Hi {n}\"\n+def greet(n):\n+    return fmt(n)",
+  "repo_files": {
+    "src/hello.py": "def fmt(n):\n    return f\"Hi {n}\"\ndef greet(n):\n    return fmt(n)\n"
+  },
+  "ground_truth": {
+    "should_approve": true,
+    "bugs": []
+  }
+}

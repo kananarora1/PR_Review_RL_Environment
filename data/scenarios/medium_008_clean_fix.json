@@ -1,0 +1,12 @@
+{
+  "pr_title": "fix: bind params",
+  "pr_description": "Fix sql injection.",
+  "diff": "--- a/src/db.py\n+++ b/src/db.py\n@@ -2,2 +2,2 @@\n def get_u(c, u):\n-    c.execute(f\"SELECT * FROM u WHERE n='{u}'\")\n+    c.execute(\"SELECT * FROM u WHERE n=?\", (u,))",
+  "repo_files": {
+    "src/db.py": "def get_u(c, u):\n    c.execute(\"SELECT * FROM u WHERE n=?\", (u,))\n"
+  },
+  "ground_truth": {
+    "should_approve": true,
+    "bugs": []
+  }
+}

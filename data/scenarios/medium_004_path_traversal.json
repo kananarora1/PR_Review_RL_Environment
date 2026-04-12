@@ -1,0 +1,23 @@
+{
+  "pr_title": "feat: download invoice",
+  "pr_description": "Allows users to download invoice.",
+  "diff": "--- a/src/files.py\n+++ b/src/files.py\n@@ -0,0 +1,4 @@\n+import os\n+def get_file(name):\n+    p = os.path.join(\"/data\", name)\n+    return open(p).read()",
+  "repo_files": {
+    "src/files.py": "import os\ndef get_file(name):\n    p = os.path.join(\"/data\", name)\n    return open(p).read()\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/files.py",
+        "line": 3,
+        "keywords": [
+          "path traversal",
+          "directory traversal",
+          "../",
+          "sanitize"
+        ]
+      }
+    ]
+  }
+}
