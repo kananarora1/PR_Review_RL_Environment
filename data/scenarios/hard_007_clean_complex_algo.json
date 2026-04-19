@@ -1,0 +1,12 @@
+{
+  "pr_title": "feat: merge lists",
+  "pr_description": "Merge sorted lists.",
+  "diff": "--- a/src/merge.py\n+++ b/src/merge.py\n@@ -0,0 +1,4 @@\n+import heapq\n+def merge(lists):\n+    return list(heapq.merge(*lists))",
+  "repo_files": {
+    "src/merge.py": "import heapq\ndef merge(lists):\n    return list(heapq.merge(*lists))\n"
+  },
+  "ground_truth": {
+    "should_approve": true,
+    "bugs": []
+  }
+}

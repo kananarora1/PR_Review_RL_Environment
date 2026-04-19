@@ -1,0 +1,12 @@
+{
+  "pr_title": "docs: update readme",
+  "pr_description": "Fixes a typo.",
+  "diff": "--- a/README.md\n+++ b/README.md\n@@ -1,2 +1,2 @@\n ## Setup\n-Run `pip install -r reqs.txt`\n+Run `pip install -r requirements.txt`",
+  "repo_files": {
+    "README.md": "## Setup\nRun `pip install -r requirements.txt`\n"
+  },
+  "ground_truth": {
+    "should_approve": true,
+    "bugs": []
+  }
+}

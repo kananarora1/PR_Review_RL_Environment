@@ -1,0 +1,22 @@
+{
+  "pr_title": "feat: double check lock",
+  "pr_description": "Lazy init cache.",
+  "diff": "--- a/src/cache.py\n+++ b/src/cache.py\n@@ -0,0 +1,6 @@\n+import threading\n+_c = None; _l = threading.Lock()\n+def get_c():\n+    global _c\n+    if not _c:\n+        with _l: _c = {}\n+    return _c",
+  "repo_files": {
+    "src/cache.py": "import threading\n_c = None; _l = threading.Lock()\ndef get_c():\n    global _c\n    if not _c:\n        with _l: _c = {}\n    return _c\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/cache.py",
+        "line": 5,
+        "keywords": [
+          "double check lock",
+          "race condition",
+          "second check missing"
+        ]
+      }
+    ]
+  }
+}

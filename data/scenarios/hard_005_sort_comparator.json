@@ -1,0 +1,22 @@
+{
+  "pr_title": "feat: rank results",
+  "pr_description": "Sort with none values.",
+  "diff": "--- a/src/rank.py\n+++ b/src/rank.py\n@@ -0,0 +1,3 @@\n+def rank(results):\n+    # results has dicts with 'score' which can be None\n+    return sorted(results, key=lambda x: x['score'])",
+  "repo_files": {
+    "src/rank.py": "def rank(results):\n    # results has dicts with 'score' which can be None\n    return sorted(results, key=lambda x: x['score'])\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/rank.py",
+        "line": 3,
+        "keywords": [
+          "typeerror",
+          "none comparison",
+          "unsupported operand"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "pr_title": "feat: parse config",
+  "pr_description": "Load yaml config.",
+  "diff": "--- a/src/cfg.py\n+++ b/src/cfg.py\n@@ -0,0 +1,3 @@\n+import yaml\n+def load(s):\n+    return yaml.load(s)",
+  "repo_files": {
+    "src/cfg.py": "import yaml\ndef load(s):\n    return yaml.load(s)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/cfg.py",
+        "line": 3,
+        "keywords": [
+          "yaml.load",
+          "unsafe",
+          "safe_load",
+          "arbitrary code execution"
+        ]
+      }
+    ]
+  }
+}

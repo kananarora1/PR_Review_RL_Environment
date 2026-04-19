@@ -1,0 +1,23 @@
+{
+  "pr_title": "fix: str comparison",
+  "pr_description": "Use identity instead of equality to fix pylint.",
+  "diff": "--- a/src/check.py\n+++ b/src/check.py\n@@ -1,2 +1,2 @@\n def is_admin(role):\n-    return role == \"admin\"\n+    return role is \"admin\"",
+  "repo_files": {
+    "src/check.py": "def is_admin(role):\n    return role is \"admin\"\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/check.py",
+        "line": 2,
+        "keywords": [
+          "identity comparison",
+          "string interning",
+          "is not",
+          "use =="
+        ]
+      }
+    ]
+  }
+}

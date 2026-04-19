@@ -1,0 +1,24 @@
+{
+  "pr_title": "fix: pagination limit",
+  "pr_description": "Increases max limit to 100.",
+  "diff": "--- a/src/api.py\n+++ b/src/api.py\n@@ -2,3 +2,3 @@\n def get(l):\n-    if l > 50: raise Exception()\n+    if l > 100: raise Exception()\n     return db.fetch(l)",
+  "repo_files": {
+    "src/config.py": "MAX_DB = 50\n",
+    "src/api.py": "def get(l):\n    if l > 100: raise Exception()\n    return db.fetch(l)\n"
+  },
+  "ground_truth": {
+    "should_approve": false,
+    "bugs": [
+      {
+        "file": "src/api.py",
+        "line": 2,
+        "keywords": [
+          "magic number",
+          "config",
+          "MAX_DB",
+          "cross-file"
+        ]
+      }
+    ]
+  }
+}
